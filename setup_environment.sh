@@ -28,3 +28,5 @@ echo "QNN_SDK_ROOT set to: ${QNN_SDK_ROOT}"
 echo "QNN_TARGET_ARCH set to: ${QNN_TARGET_ARCH}"
 
 source "${QNN_SDK_ROOT}/bin/envsetup.sh"
+
+python3 ./check-python-dependency

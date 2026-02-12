@@ -1,2 +1,4 @@
 qnn/
 conversion/python/unet/__*
+*.pt
+*.pth
