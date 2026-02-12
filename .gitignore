@@ -2,3 +2,6 @@ qnn/
 conversion/python/unet/__*
 *.pt
 *.pth
+model_tmp/
+.pkl_*
+__pycache__
