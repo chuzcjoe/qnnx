@@ -5,6 +5,16 @@ echo "Usage: $0 <backend: cpu|gpu|htp>"
 
 backend=$1
 
+if [ -z "${backend}" ]; then
+    exit 1
+fi
+
+if [ "${QNN_TARGET_ARCH}" != "aarch64-android" ]; then
+    echo "Error: QNN_TARGET_ARCH must be 'aarch64-android' for on-device runs."
+    echo "Run: source setup_environment.sh aarch64-android"
+    exit 1
+fi
+
 rm -rf build
 mkdir -p build
 cd build
@@ -13,7 +23,7 @@ device_path=/data/local/tmp/qnnx
 
 cmake_options+=(-DCMAKE_BUILD_TYPE=Debug
                 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
-                -DANDROID_ABI=$target
+                -DANDROID_ABI=arm64-v8a
                 -DANDROID_PLATFORM=android-34)
 
 cmake "${cmake_options[@]}" ../
