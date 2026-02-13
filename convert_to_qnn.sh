@@ -30,8 +30,8 @@ if [ "$BACKEND" = "cpu" ] || [ "$BACKEND" = "gpu" ]; then
     -o ./model_tmp/$QNN_MODEL_CPP_NAME
 
     python3 "${QNN_SDK_ROOT}/bin/x86_64-linux-clang/qnn-model-lib-generator" \
-    -c ./model_tmp/$QNN_MODEL_CPP_NAME \
-    -b ./model_tmp/$QNN_MODEL_BIN_NAME \
+    -c ./model_tmp/${QNN_MODEL_CPP_NAME} \
+    -b ./model_tmp/${QNN_MODEL_BIN_NAME} \
     -o ./model_tmp/fp32 \
     -t $QNN_TARGET_ARCH
 
