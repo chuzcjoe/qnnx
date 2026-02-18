@@ -43,3 +43,4 @@ else
     exit 1
 fi
 
+echo "/data/local/tmp/qnnx/test.raw" > ./model_tmp/input_list.txt

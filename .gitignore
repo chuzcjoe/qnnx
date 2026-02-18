@@ -8,3 +8,4 @@ __pycache__
 sample_app/
 build/
 include/
+output/
