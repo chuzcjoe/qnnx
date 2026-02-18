@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 
-filename = "../../../output/Result_0/model_layout_transform_0_0.raw"
+filename = "../../output/Result_0/model_layout_transform_0_0.raw"
 raw = np.fromfile(filename, dtype=np.float32)
 logits = raw.reshape(1, 750, 1000, 21)[0]
 logits = np.transpose(logits, (2, 0, 1))

@@ -16,6 +16,8 @@ mkdir -p model_tmp
 
 echo "QNN_SDK_ROOT: ${QNN_SDK_ROOT}"
 
+CURRENT_DIR=$PWD
+
 if [ "$BACKEND" = "cpu" ] || [ "$BACKEND" = "gpu" ]; then
     echo "Converting Pytorch model to FP32 QNN model"
 
@@ -57,7 +59,7 @@ elif [ "$BACKEND" = "htp" ]; then
       echo '      "graph_names": ['
       echo "        \"${QNN_MODEL_NAME}\""
       echo '      ],'
-      echo '      "vtcm_mb": 2'
+      echo '      "vtcm_mb": 8'
       echo '    }'
       echo '  ],'
       echo '  "devices": ['
@@ -72,7 +74,7 @@ elif [ "$BACKEND" = "htp" ]; then
       echo '{'
       echo '  "backend_extensions": {'
       echo "    \"shared_library_path\": \"${QNN_SDK_ROOT}/lib/${QNN_TARGET_ARCH}/libQnnHtpNetRunExtensions.so\","
-      echo '    "config_file_path": "./model_tmp/htp_config.json"'
+      echo "    \"config_file_path\": \"${CURRENT_DIR}/model_tmp/htp_config.json\""
       echo '  }'
       echo '}'
     } > ./model_tmp/htp_backend_extensions.json
@@ -93,7 +95,7 @@ elif [ "$BACKEND" = "htp" ]; then
     ${QNN_SDK_ROOT}/bin/${QNN_TARGET_ARCH}/qnn-context-binary-generator \
     --backend "${QNN_SDK_ROOT}/lib/${QNN_TARGET_ARCH}/libQnnHtp.so" \
     --model "./model_tmp/quant/${QNN_TARGET_ARCH}/lib${QNN_MODEL_NAME}.so" \
-    --binary_file "./model_tmp/${QNN_MODEL_NAME}.serialized" \
+    --binary_file "${CURRENT_DIR}/model_tmp/lib${QNN_MODEL_NAME}.serialized" \
     --config_file "./model_tmp/htp_backend_extensions.json"
 
 
