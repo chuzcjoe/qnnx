@@ -8,7 +8,8 @@
 
 1. Ubuntu 22.04 (x86-64 architecture) is required as the operating system.
 2. Python 3.10 is required and has been verified to work correctly with this project.
-3. QNN SDK is required, for this project, i am using 2.43.0.260128. It can be downloaded from [here](https://www.qualcomm.com/developer/software/qualcomm-ai-engine-direct-sdk)
+3. Python virtual environment is strongly recommended to install specific versions of libraries.
+4. QNN SDK is required, for this project, i am using 2.43.0.260128. It can be downloaded from [here](https://www.qualcomm.com/developer/software/qualcomm-ai-engine-direct-sdk)
 
 After QNN SDK is downloaded and extracted, we need to configure the `bashrc.` or `.zshrc` file to export ANDROID NDK path.
 
@@ -42,4 +43,22 @@ Quantized model is used for HTP backend inference. Quantized models have to be c
 
 ```bash
 ./convert_to_qnn.sh ./python/fcn/fcn.pt 1 3 750 1000 htp v73
+```
+
+# 3. Inference on device
+
+## 3.1 Inference on CPU/GPU
+
+```bash
+./run.sh cpu
+
+# or
+
+./run.sh gpu
+```
+
+## 3.2 Inference on HTP
+
+```bash
+./run.sh htp
 ```
