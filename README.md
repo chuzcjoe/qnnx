@@ -4,6 +4,8 @@
   <img src="./imgs/qnnx_logo.png" alt="qnnx" width="60%"/>
 </p> -->
 
+**QNNX** provides an end-to-end solution for deploying your trained AI models on devices powered by Qualcomm chipsets.
+
 # 1. Environment
 
 1. Ubuntu 22.04 (x86-64 architecture) is required as the operating system.
