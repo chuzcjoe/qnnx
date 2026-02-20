@@ -11,6 +11,15 @@ WIDTH=$5
 BACKEND=$6
 HTP_VERSION=${7:-v73}
 
+if [ "$BACKEND" = "cpu" ] || [ "$BACKEND" = "gpu" ]; then
+    source ./setup_environment.sh aarch64-android
+elif [ "$BACKEND" = "htp" ]; then
+    source ./setup_environment.sh x86_64-linux-clang
+else
+    echo "Unsupported backend: $BACKEND"
+    exit 1
+fi
+
 rm -rf model_tmp
 mkdir -p model_tmp
 

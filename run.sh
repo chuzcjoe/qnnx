@@ -9,6 +9,8 @@ if [ -z "${backend}" ]; then
     exit 1
 fi
 
+source ./setup_environment.sh aarch64-android
+
 if [ "${QNN_TARGET_ARCH}" != "aarch64-android" ]; then
     echo "Error: QNN_TARGET_ARCH must be 'aarch64-android' for on-device runs."
     echo "Run: source setup_environment.sh aarch64-android"
@@ -19,7 +21,6 @@ rm -rf output/
 rm -rf build
 mkdir -p build
 cd build
-
 
 device_path=/data/local/tmp/qnnx
 
