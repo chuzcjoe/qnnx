@@ -18,6 +18,6 @@ export PATH="${ANDROID_NDK_ROOT}:${PATH}"
 ```
 
 In `setup_environment.sh`, configure the `QNN_SDK_ROOT` to your local path
-```
+```bash
 export QNN_SDK_ROOT="<qnn-sdk-path>/qairt/2.43.0.260128"
 ```
