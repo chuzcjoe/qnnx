@@ -2,12 +2,6 @@
 
 namespace qnnx {
 
-typedef Qnn_ErrorHandle_t (*QnnInterfaceGetProvidersFn_t)(const QnnInterface_t*** providerList,
-                                                          uint32_t* numProviders);
-
-typedef Qnn_ErrorHandle_t (*QnnSystemInterfaceGetProvidersFn_t)(
-    const QnnSystemInterface_t*** providerList, uint32_t* numProviders);
-
 template <class T>
 static inline T ResolveSymbol(void* lib_handle, const char* sym) {
   T ptr = (T)dlSym(lib_handle, sym);
@@ -59,9 +53,7 @@ int dlClose(void* handle) {
   return dlclose(handle);
 }
 
-char* dlError() {
-  return dlerror();
-}
+char* dlError() { return dlerror(); }
 
 QNNResults GetQNNFunctionPointer(std::string backend_path, std::string model_path,
                                  QnnFunctionPointers* function_pointers, void** backend_handle,
@@ -129,8 +121,7 @@ QNNResults GetQNNFunctionPointer(std::string backend_path, std::string model_pat
 
     std::string model_prepare_func = "QnnModel_composeGraphs";
     function_pointers->composeGraphsFnHandle =
-        ResolveSymbol<ComposeGraphsFnHandleType_t>(lib_model_handle,
-                                                               model_prepare_func.c_str());
+        ResolveSymbol<ComposeGraphsFnHandleType_t>(lib_model_handle, model_prepare_func.c_str());
     if (nullptr == function_pointers->composeGraphsFnHandle) {
       return QNNResults::FAIL_SYM_FUNCTION;
     }

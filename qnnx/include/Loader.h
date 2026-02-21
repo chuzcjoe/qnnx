@@ -10,14 +10,15 @@
 
 namespace qnnx {
 
-#define DL_DEFAULT (void *)(0x4)
+#define DL_DEFAULT (void*)(0x4)
 
-enum { 
-    DL_NOW = 0x0001, 
-    DL_LOCAL = 0x0002, 
-    DL_GLOBAL = 0x0004, 
-    DL_NOLOAD = 0x0008 
-};
+enum { DL_NOW = 0x0001, DL_LOCAL = 0x0002, DL_GLOBAL = 0x0004, DL_NOLOAD = 0x0008 };
+
+typedef Qnn_ErrorHandle_t (*QnnInterfaceGetProvidersFn_t)(const QnnInterface_t*** providerList,
+                                                          uint32_t* numProviders);
+
+typedef Qnn_ErrorHandle_t (*QnnSystemInterfaceGetProvidersFn_t)(
+    const QnnSystemInterface_t*** providerList, uint32_t* numProviders);
 
 void* dlOpen(const char* filename, int flags);
 
