@@ -1,28 +1,26 @@
 #pragma once
 
-#include "Commons.h"
-
 #include <string>
+
+#include "Commons.h"
 
 namespace qnnx {
 
 class Model {
-public:
-    Model(QnnFunctionPointers function_pointers, void* backend_handle,
-            const std::string input_list_path, const std::string output_path,
-            OutputDataType output_data_type = OutputDataType::FLOAT_ONLY,
-            InputDataType input_data_type = InputDataType::FLOAT,
-            const bool debug = false,
-            const int num_inference = 1,
-            const bool dump_output = false);
+ public:
+  Model(QnnFunctionPointers function_pointers, void* backend_handle,
+        const std::string input_list_path, const std::string output_path,
+        OutputDataType output_data_type = OutputDataType::FLOAT_ONLY,
+        InputDataType input_data_type = InputDataType::FLOAT, const bool debug = false,
+        const int num_inference = 1, const bool dump_output = false);
 
-    ~Model(); 
+  ~Model();
 
-    void Init();
-    void PopulateTensors();
-    void Run();
+  void Init();
+  void PopulateTensors();
+  void Run();
 
-private:
+ private:
   QNNResults Initialize();
 
   QNNResults InitializeBackend();
@@ -53,7 +51,7 @@ private:
 
   QNNResults VerifyFailReturnStatus(Qnn_ErrorHandle_t errCode);
 
-private:
+ private:
   QnnFunctionPointers function_pointers_;
   void* backend_handle_;
   std::string input_list_path_;
@@ -65,4 +63,4 @@ private:
   bool dump_output_;
 };
 
-} // namespace qnnx
+}  // namespace qnnx
