@@ -20,6 +20,6 @@ file(GLOB APP_SOURCES
 
 add_executable(${APP} ${APP_SOURCES})
 
-include_directories(. Log PAL/include Utils WrapperUtils ../include/QNN)
+include_directories(. Log PAL/include Utils WrapperUtils ../external/include/QNN)
 
 

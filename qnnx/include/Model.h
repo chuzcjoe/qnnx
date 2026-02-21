@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Commons.h"
+#include "Tensor.h"
 
 namespace qnnx {
 
