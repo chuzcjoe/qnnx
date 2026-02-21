@@ -4,8 +4,9 @@ qnn/
 model_tmp/
 .pkl_*
 __pycache__
-sample_app/
+# sample_app/
 build/
-include/QNN/
-include/*
+# include/QNN/
+# include/*
 output/
+.vscode/
