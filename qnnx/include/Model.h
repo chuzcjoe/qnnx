@@ -1,0 +1,68 @@
+#pragma once
+
+#include "Commons.h"
+
+#include <string>
+
+namespace qnnx {
+
+class Model {
+public:
+    Model(QnnFunctionPointers function_pointers, void* backend_handle,
+            const std::string input_list_path, const std::string output_path,
+            OutputDataType output_data_type = OutputDataType::FLOAT_ONLY,
+            InputDataType input_data_type = InputDataType::FLOAT,
+            const bool debug = false,
+            const int num_inference = 1,
+            const bool dump_output = false);
+
+    ~Model();
+
+    void Init();
+    void PopulateTensors();
+    void Run();
+
+private:
+  QNNResults Initialize();
+
+  QNNResults InitializeBackend();
+
+  QNNResults CreateContext();
+
+  QNNResults ComposeGraphs();
+
+  QNNResults FinalizeGraphs();
+
+  QNNResults ExecuteGraphs();
+
+  QNNResults FreeContext();
+
+  QNNResults TerminateBackend();
+
+  QNNResults InitializeProfiling();
+
+  std::string GetBackendBuildId();
+
+  QNNResults IsDevicePropertySupported();
+
+  QNNResults IsFinalizeDeserializedGraphSupported();
+
+  QNNResults CreateDevice();
+
+  QNNResults FreeDevice();
+
+  QNNResults VerifyFailReturnStatus(Qnn_ErrorHandle_t errCode);
+
+private:
+  QnnFunctionPointers function_pointers_;
+  void* backend_handle_;
+  std::string input_list_path_;
+  std::string output_path_;
+  OutputDataType output_data_type_;
+  InputDataType input_data_type_;
+  bool debug_;
+  int num_inference_;
+  bool dump_output_;
+};
+
+} // namespace qnnx

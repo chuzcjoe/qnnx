@@ -9,6 +9,6 @@ file(GLOB APP_SOURCES
 
 add_executable(${APP} ${APP_SOURCES})
 
-include_directories(include ../include/QNN)
+include_directories(include ../external/include/QNN)
 
 target_link_libraries(${APP} log)

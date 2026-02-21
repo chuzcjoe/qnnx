@@ -10,3 +10,4 @@ build/
 # include/*
 output/
 .vscode/
+.DS_Store
