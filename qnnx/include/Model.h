@@ -16,7 +16,7 @@ public:
             const int num_inference = 1,
             const bool dump_output = false);
 
-    ~Model();
+    ~Model(); 
 
     void Init();
     void PopulateTensors();
