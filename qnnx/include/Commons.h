@@ -1,5 +1,6 @@
 #pragma once
 
+#include "QnnCommon.h"
 #include "QnnInterface.h"
 #include "System/QnnSystemInterface.h"
 

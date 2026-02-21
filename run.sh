@@ -35,7 +35,7 @@ make -j10
 cd ..
 
 
-adb shell "rm -rf ${device_path}"
+# adb shell "rm -rf ${device_path}"
 adb shell "mkdir -p ${device_path}"
 adb shell "mkdir -p ${device_path}/output"
 
