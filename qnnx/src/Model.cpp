@@ -35,6 +35,7 @@ void Model::Init() {
     case ARCH::GPU:
       Assert(CreateContext(), "failed to create context");
       Assert(ComposeGraphs(), "failed to compose graphs");
+      Assert(FinalizeGraphs(), "failed to finalize graphs");
       break;
     case ARCH::DSP:
       QNNX_ERROR("DSP backend is not supported yet");
@@ -166,6 +167,7 @@ QNNResults Model::CreateContext() {
   return QNNResults::SUCCESS;
 }
 
+// compose graphs, default is to use model.so
 QNNResults Model::ComposeGraphs() {
   auto result = QNNResults::SUCCESS;
 
@@ -178,6 +180,44 @@ QNNResults Model::ComposeGraphs() {
                             qnnx_logger_->GetLogCallback(), qnnx_logger_->GetLogLevel())) {
     QNNX_ERROR("Failed in composeGraphs()");
     result = QNNResults::FAIL;
+  }
+  return result;
+}
+
+QNNResults Model::FinalizeGraphs() {
+  for (size_t graph_idx = 0; graph_idx < graphs_count_; ++graph_idx) {
+    // Profile this API call
+    QnnSystemProfile_ProfileData_t profile_data = QNN_SYSTEM_PROFILE_DATA_INIT;
+    if (ProfilingLevel::OFF != profiling_level_ && serialization_target_handle_ != nullptr) {
+      profile_data.version = QNN_SYSTEM_PROFILE_DATA_VERSION_1;
+      profile_data.v1.header.methodType = QNN_SYSTEM_PROFILE_METHOD_TYPE_BACKEND_FINALIZE;
+      profile_data.v1.header.startTime = GetTimeStampInUs();
+      profile_data.v1.header.graphName = (*graphs_info_)[graph_idx].graphName;
+    }
+
+    if (QNN_GRAPH_NO_ERROR !=
+        function_pointers_.qnnInterface.graphFinalize((*graphs_info_)[graph_idx].graph,
+                                                      profile_backend_handle_, nullptr)) {
+      return QNNResults::FAIL;
+    }
+
+    // TODO: implement profiling stop time extraction
+    // if (ProfilingLevel::OFF != profiling_level_) {
+    //   if (serialization_target_handle_ != nullptr) {
+    //     profile_data.v1.header.stopTime = GetTimeStampInUs();
+    //     extractBackendProfilingInfo(profile_backend_handle_, &profile_data);
+    //   } else {
+    //     extractBackendProfilingInfo(profile_backend_handle_, nullptr);
+    //   }
+    // }
+  }
+  auto result = QNNResults::SUCCESS;
+  if (!save_binary_name_.empty()) {
+    QNNX_INFO("Before SaveBinary(): saving context and metadata.");
+    // TODO: implement SaveBinary()
+    // result = SaveBinary();
+  } else {
+    QNNX_DEBUG("save_binary_name_ is empty()");
   }
   return result;
 }

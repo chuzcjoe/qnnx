@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
 #include "Commons.h"
@@ -59,6 +60,12 @@ class Model {
 
   static void Assert(QNNResults result, const std::string& error_message);
 
+  uint64_t GetTimeStampInUs() {
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+               std::chrono::steady_clock::now().time_since_epoch())
+        .count();
+  }
+
  private:
   // commons
   ARCH arch_;
@@ -85,6 +92,7 @@ class Model {
 
   // profiling related
   ProfilingLevel profiling_level_ = ProfilingLevel::OFF;
+  Qnn_ProfileHandle_t profile_backend_handle_ = nullptr;
 
   // context related
   Qnn_ContextHandle_t context_ = nullptr;
@@ -96,6 +104,10 @@ class Model {
   uint32_t graphs_count_ = 0;
   GraphConfigInfo_t** graph_configs_info_ = nullptr;
   uint32_t graph_configs_info_count_ = 0;
+
+  // others
+  QnnSystemProfile_SerializationTargetHandle_t serialization_target_handle_ = nullptr;
+  std::string save_binary_name_;
 };
 
 }  // namespace qnnx
