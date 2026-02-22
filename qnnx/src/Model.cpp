@@ -27,6 +27,7 @@ void Model::Init() {
   Assert(IsDevicePropertySupported(), "device property is not supported by backend");
   Assert(CreateDevice(), "failed to create device");
   Assert(InitializeProfiling(), "failed to initialize profiling");
+  Assert(RegisterOpPackages(), "failed to register op packages");
 }
 
 void Model::PopulateTensors() {
@@ -127,6 +128,12 @@ QNNResults Model::InitializeProfiling() {
     return QNNResults::SUCCESS;
   }
   return QNNResults::FAIL;
+}
+
+// TODO: Implement op package registration in the future
+QNNResults Model::RegisterOpPackages() {
+  // Register op packages code here
+  return QNNResults::SUCCESS;
 }
 
 // Get backend build ID

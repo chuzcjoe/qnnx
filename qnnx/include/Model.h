@@ -35,6 +35,8 @@ class Model {
 
   QNNResults InitializeProfiling();
 
+  QNNResults RegisterOpPackages();
+
   QNNResults CreateContext();
 
   QNNResults ComposeGraphs();
