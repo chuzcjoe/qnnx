@@ -26,6 +26,7 @@ void Model::Init() {
   Assert(InitializeBackend(), "failed to initialize backend");
   Assert(IsDevicePropertySupported(), "device property is not supported by backend");
   Assert(CreateDevice(), "failed to create device");
+  Assert(InitializeProfiling(), "failed to initialize profiling");
 }
 
 void Model::PopulateTensors() {
@@ -92,6 +93,7 @@ QNNResults Model::IsDevicePropertySupported() {
   return QNNResults::SUCCESS;
 }
 
+// create device
 QNNResults Model::CreateDevice() {
   if (nullptr != function_pointers_.qnnInterface.deviceCreate) {
     auto result =
@@ -117,6 +119,14 @@ QNNResults Model::CreateDevice() {
     }
   }
   return QNNResults::SUCCESS;
+}
+
+// TODO: Implement profiling initialization when profiling is enabled
+QNNResults Model::InitializeProfiling() {
+  if (ProfilingLevel::OFF == profiling_level_) {
+    return QNNResults::SUCCESS;
+  }
+  return QNNResults::FAIL;
 }
 
 // Get backend build ID

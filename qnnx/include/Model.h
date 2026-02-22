@@ -33,6 +33,8 @@ class Model {
 
   QNNResults CreateDevice();
 
+  QNNResults InitializeProfiling();
+
   QNNResults CreateContext();
 
   QNNResults ComposeGraphs();
@@ -45,8 +47,6 @@ class Model {
 
   QNNResults TerminateBackend();
 
-  QNNResults InitializeProfiling();
-
   std::string GetBackendBuildId();
 
   QNNResults IsFinalizeDeserializedGraphSupported();
@@ -58,6 +58,7 @@ class Model {
   static void Assert(QNNResults result, const std::string& error_message);
 
  private:
+  // commons
   QnnFunctionPointers function_pointers_;
   void* backend_handle_;
   std::string input_list_path_;
@@ -78,6 +79,9 @@ class Model {
 
   // device related
   Qnn_DeviceHandle_t device_handle_ = nullptr;
+
+  // profiling related
+  ProfilingLevel profiling_level_ = ProfilingLevel::OFF;
 };
 
 }  // namespace qnnx

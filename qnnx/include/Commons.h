@@ -19,6 +19,8 @@ enum class QNNResults {
   FAIL_FEATURE_UNSUPPORTED
 };
 
+enum class ProfilingLevel { OFF, BASIC, DETAILED, INVALID };
+
 typedef enum ModelError {
   MODEL_NO_ERROR = 0,
   MODEL_TENSOR_ERROR = 1,
