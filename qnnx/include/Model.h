@@ -5,6 +5,7 @@
 #include "Commons.h"
 #include "File.h"
 #include "Log.h"
+#include "QnnxLog.h"
 #include "Tensor.h"
 
 namespace qnnx {
@@ -66,6 +67,10 @@ class Model {
   bool debug_;
   int num_inference_;
   bool dump_output_;
+
+  // Log related
+  std::shared_ptr<QnnxLog> qnnx_logger_ = nullptr;
+  Qnn_LogHandle_t log_handle_ = nullptr;
 };
 
 }  // namespace qnnx

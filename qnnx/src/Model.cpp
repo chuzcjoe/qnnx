@@ -43,6 +43,10 @@ QNNResults Model::Initialize() {
     }
   }
 
+  if (nullptr == qnnx_logger_) {
+    qnnx_logger_ = std::make_shared<QnnxLog>(nullptr);
+  }
+
   return QNNResults::SUCCESS;
 }
 
