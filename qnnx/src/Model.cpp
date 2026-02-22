@@ -34,6 +34,7 @@ void Model::Init() {
     case ARCH::CPU:
     case ARCH::GPU:
       Assert(CreateContext(), "failed to create context");
+      Assert(ComposeGraphs(), "failed to compose graphs");
       break;
     case ARCH::DSP:
       QNNX_ERROR("DSP backend is not supported yet");
@@ -153,6 +154,7 @@ QNNResults Model::RegisterOpPackages() {
   return QNNResults::SUCCESS;
 }
 
+// create cpu/gpu context
 QNNResults Model::CreateContext() {
   if (QNN_CONTEXT_NO_ERROR != function_pointers_.qnnInterface.contextCreate(
                                   backend_handle_, device_handle_,
@@ -162,6 +164,22 @@ QNNResults Model::CreateContext() {
   }
   context_created_ = true;
   return QNNResults::SUCCESS;
+}
+
+QNNResults Model::ComposeGraphs() {
+  auto result = QNNResults::SUCCESS;
+
+  // compose with QNN's model.so
+  QNNX_INFO("Using model.so for graph composition");
+  if (MODEL_NO_ERROR != function_pointers_.composeGraphsFnHandle(
+                            backend_handle_, function_pointers_.qnnInterface, context_,
+                            (const GraphConfigInfo_t**)graph_configs_info_,
+                            graph_configs_info_count_, &graphs_info_, &graphs_count_, debug_,
+                            qnnx_logger_->GetLogCallback(), qnnx_logger_->GetLogLevel())) {
+    QNNX_ERROR("Failed in composeGraphs()");
+    result = QNNResults::FAIL;
+  }
+  return result;
 }
 
 // Get backend build ID

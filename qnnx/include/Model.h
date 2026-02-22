@@ -90,6 +90,12 @@ class Model {
   Qnn_ContextHandle_t context_ = nullptr;
   QnnContext_Config_t** context_config_ = nullptr;
   bool context_created_ = false;
+
+  // graph related
+  GraphInfo_t** graphs_info_ = nullptr;
+  uint32_t graphs_count_ = 0;
+  GraphConfigInfo_t** graph_configs_info_ = nullptr;
+  uint32_t graph_configs_info_count_ = 0;
 };
 
 }  // namespace qnnx
