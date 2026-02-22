@@ -71,6 +71,10 @@ class Model {
   // Log related
   std::shared_ptr<QnnxLog> qnnx_logger_ = nullptr;
   Qnn_LogHandle_t log_handle_ = nullptr;
+
+  // backend related
+  QnnBackend_Config_t** backend_config_ = nullptr;
+  bool backend_initialized_ = false;
 };
 
 }  // namespace qnnx

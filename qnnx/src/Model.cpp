@@ -23,6 +23,7 @@ void Model::Init() {
   QNNX_INFO("Backend build ID: {%s}", build_id.c_str());
 
   Assert(Initialize(), "failed to create folder and init log");
+  Assert(InitializeBackend(), "failed to initialize backend");
 }
 
 void Model::PopulateTensors() {
@@ -43,10 +44,35 @@ QNNResults Model::Initialize() {
     }
   }
 
+  // Initialize logger
   if (nullptr == qnnx_logger_) {
     qnnx_logger_ = std::make_shared<QnnxLog>(nullptr);
+    auto log_callback = qnnx_logger_->GetLogCallback();
+    auto log_level = qnnx_logger_->GetLogLevel();
+
+    auto result = function_pointers_.qnnInterface.logCreate(log_callback, log_level, &log_handle_);
+    if (QNN_SUCCESS != result) {
+      QNNX_WARN("Unable to initialize logging in the backend.");
+    } else {
+      QNNX_INFO("Logging initialized in the backend. Callback: [%p], Log Level: [%d]",
+                (void*)log_callback, log_level);
+    }
+  }
+  return QNNResults::SUCCESS;
+}
+
+// Initialize backend
+QNNResults Model::InitializeBackend() {
+  auto result = function_pointers_.qnnInterface.backendCreate(
+      log_handle_, (const QnnBackend_Config_t**)backend_config_, &backend_handle_);
+
+  if (QNN_BACKEND_NO_ERROR != result) {
+    QNNX_ERROR("Could not initialize backend due to error = %lu", result);
+    return QNNResults::FAIL;
   }
 
+  QNNX_INFO("Initialize backend success, returned status = %lu", result);
+  backend_initialized_ = true;
   return QNNResults::SUCCESS;
 }
 

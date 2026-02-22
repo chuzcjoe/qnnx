@@ -1,5 +1,7 @@
 #include "QnnxLog.h"
 
+#include <chrono>
+
 namespace qnnx {
 
 void LogDefaultCallback(const char* fmt, QnnLog_Level_t level, uint64_t timestamp, va_list argp) {
@@ -59,5 +61,11 @@ QnnxLog::QnnxLog(QnnLog_Callback_t callback) : callback_(callback) {
 }
 
 QnnxLog::~QnnxLog() {}
+
+uint64_t QnnxLog::GetTimeStamp() const {
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
+             std::chrono::system_clock::now().time_since_epoch())
+      .count();
+}
 
 }  // namespace qnnx

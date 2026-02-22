@@ -23,13 +23,15 @@ class QnnxLog {
   QnnxLog(QnnxLog&&) = delete;
   QnnxLog& operator=(QnnxLog&&) = delete;
 
-  void SetMaxLevel(QnnLog_Level_t max_level) {
-    max_level_.store(max_level, std::memory_order_seq_cst);
+  void SetLogLevel(QnnLog_Level_t log_level) {
+    max_level_.store(log_level, std::memory_order_seq_cst);
   }
 
-  QnnLog_Level_t GetMaxLevel() { return max_level_.load(std::memory_order_seq_cst); }
+  QnnLog_Level_t GetLogLevel() { return max_level_.load(std::memory_order_seq_cst); }
 
   QnnLog_Callback_t GetLogCallback() { return callback_; }
+
+  uint64_t GetTimeStamp() const;
 
  private:
   QnnLog_Callback_t callback_;
