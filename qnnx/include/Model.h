@@ -29,6 +29,8 @@ class Model {
 
   QNNResults InitializeBackend();
 
+  QNNResults IsDevicePropertySupported();
+
   QNNResults CreateContext();
 
   QNNResults ComposeGraphs();
@@ -44,8 +46,6 @@ class Model {
   QNNResults InitializeProfiling();
 
   std::string GetBackendBuildId();
-
-  QNNResults IsDevicePropertySupported();
 
   QNNResults IsFinalizeDeserializedGraphSupported();
 

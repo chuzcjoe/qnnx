@@ -24,6 +24,7 @@ void Model::Init() {
 
   Assert(Initialize(), "failed to create folder and init log");
   Assert(InitializeBackend(), "failed to initialize backend");
+  Assert(IsDevicePropertySupported(), "device property is not supported by backend");
 }
 
 void Model::PopulateTensors() {
@@ -76,6 +77,20 @@ QNNResults Model::InitializeBackend() {
   return QNNResults::SUCCESS;
 }
 
+QNNResults Model::IsDevicePropertySupported() {
+  if (nullptr != function_pointers_.qnnInterface.propertyHasCapability) {
+    auto result = function_pointers_.qnnInterface.propertyHasCapability(QNN_PROPERTY_GROUP_DEVICE);
+    if (QNN_PROPERTY_NOT_SUPPORTED == result) {
+      QNNX_WARN("Device property is not supported");
+    } else if (QNN_PROPERTY_ERROR_UNKNOWN_KEY == result) {
+      QNNX_ERROR("Device property is not known to backend");
+      return QNNResults::FAIL;
+    }
+  }
+  return QNNResults::SUCCESS;
+}
+
+// Get backend build ID
 std::string Model::GetBackendBuildId() {
   char* backend_build_id = nullptr;
   if (QNN_SUCCESS !=
