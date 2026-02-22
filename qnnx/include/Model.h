@@ -3,6 +3,8 @@
 #include <string>
 
 #include "Commons.h"
+#include "File.h"
+#include "Log.h"
 #include "Tensor.h"
 
 namespace qnnx {
@@ -51,6 +53,8 @@ class Model {
   QNNResults FreeDevice();
 
   QNNResults VerifyFailReturnStatus(Qnn_ErrorHandle_t errCode);
+
+  static void Assert(QNNResults result, const std::string& error_message);
 
  private:
   QnnFunctionPointers function_pointers_;

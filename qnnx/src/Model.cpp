@@ -19,7 +19,10 @@ Model::Model(QnnFunctionPointers function_pointers, void* backend_handle,
 Model::~Model() {}
 
 void Model::Init() {
-  // Initialization code here
+  auto build_id = GetBackendBuildId();
+  QNNX_INFO("Backend build ID: {%s}", build_id.c_str());
+
+  Assert(Initialize(), "failed to create folder and init log");
 }
 
 void Model::PopulateTensors() {
@@ -28,6 +31,34 @@ void Model::PopulateTensors() {
 
 void Model::Run() {
   // Run inference code here
+}
+
+QNNResults Model::Initialize() {
+  if (dump_output_ && !CheckFileExists(output_path_)) {
+    bool created = CreateDirectory(output_path_);
+    if (created) {
+      QNNX_INFO("Output directory created at %s", output_path_.c_str());
+    } else {
+      QNNX_ERROR("Failed to create output directory at %s", output_path_.c_str());
+    }
+  }
+
+  return QNNResults::SUCCESS;
+}
+
+std::string Model::GetBackendBuildId() {
+  char* backend_build_id = nullptr;
+  if (QNN_SUCCESS !=
+      function_pointers_.qnnInterface.backendGetBuildId((const char**)&backend_build_id)) {
+    QNNX_ERROR("Unable to get build Id from the backend.");
+  }
+  return (backend_build_id == nullptr ? std::string("") : std::string(backend_build_id));
+}
+
+void Model::Assert(QNNResults result, const std::string& error_message) {
+  if (result != QNNResults::SUCCESS) {
+    throw std::runtime_error(error_message);
+  }
 }
 
 }  // namespace qnnx
