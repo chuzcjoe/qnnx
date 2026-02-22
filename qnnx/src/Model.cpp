@@ -25,6 +25,7 @@ void Model::Init() {
   Assert(Initialize(), "failed to create folder and init log");
   Assert(InitializeBackend(), "failed to initialize backend");
   Assert(IsDevicePropertySupported(), "device property is not supported by backend");
+  Assert(CreateDevice(), "failed to create device");
 }
 
 void Model::PopulateTensors() {
@@ -77,6 +78,7 @@ QNNResults Model::InitializeBackend() {
   return QNNResults::SUCCESS;
 }
 
+// check property support
 QNNResults Model::IsDevicePropertySupported() {
   if (nullptr != function_pointers_.qnnInterface.propertyHasCapability) {
     auto result = function_pointers_.qnnInterface.propertyHasCapability(QNN_PROPERTY_GROUP_DEVICE);
@@ -85,6 +87,33 @@ QNNResults Model::IsDevicePropertySupported() {
     } else if (QNN_PROPERTY_ERROR_UNKNOWN_KEY == result) {
       QNNX_ERROR("Device property is not known to backend");
       return QNNResults::FAIL;
+    }
+  }
+  return QNNResults::SUCCESS;
+}
+
+QNNResults Model::CreateDevice() {
+  if (nullptr != function_pointers_.qnnInterface.deviceCreate) {
+    auto result =
+        function_pointers_.qnnInterface.deviceCreate(log_handle_, nullptr, &device_handle_);
+    if (QNN_SUCCESS != result && QNN_DEVICE_ERROR_UNSUPPORTED_FEATURE != result) {
+      QNNX_ERROR("Failed to create device");
+
+      QNNResults return_result = QNNResults::FAIL;
+      switch (result) {
+        case QNN_COMMON_ERROR_SYSTEM_COMMUNICATION:
+          return_result = QNNResults::FAIL_SYSTEM_COMMUNICATION_ERROR;
+          break;
+        case QNN_COMMON_ERROR_SYSTEM:
+          return_result = QNNResults::FAIL_SYSTEM_ERROR;
+          break;
+        case QNN_COMMON_ERROR_NOT_SUPPORTED:
+          return_result = QNNResults::FAIL_FEATURE_UNSUPPORTED;
+          break;
+        default:
+          break;
+      }
+      return return_result;
     }
   }
   return QNNResults::SUCCESS;

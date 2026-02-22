@@ -31,6 +31,8 @@ class Model {
 
   QNNResults IsDevicePropertySupported();
 
+  QNNResults CreateDevice();
+
   QNNResults CreateContext();
 
   QNNResults ComposeGraphs();
@@ -48,8 +50,6 @@ class Model {
   std::string GetBackendBuildId();
 
   QNNResults IsFinalizeDeserializedGraphSupported();
-
-  QNNResults CreateDevice();
 
   QNNResults FreeDevice();
 
@@ -75,6 +75,9 @@ class Model {
   // backend related
   QnnBackend_Config_t** backend_config_ = nullptr;
   bool backend_initialized_ = false;
+
+  // device related
+  Qnn_DeviceHandle_t device_handle_ = nullptr;
 };
 
 }  // namespace qnnx
