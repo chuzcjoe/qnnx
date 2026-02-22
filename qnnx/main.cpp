@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  std::cout << "arch: " << parser->arch << '\n';
   std::cout << "backend: " << parser->backend << '\n';
   std::cout << "model: " << parser->model << '\n';
   std::cout << "input_list: " << parser->input_list << '\n';
@@ -33,7 +34,18 @@ int main(int argc, char** argv) {
     throw std::runtime_error("failed to load QNN libraries");
   }
 
-  auto model = std::make_unique<qnnx::Model>(qnn_function_pointers, sg_backend_handle,
+  qnnx::ARCH arch = qnnx::ARCH::CPU;
+  if (parser->arch == "cpu") {
+    arch = qnnx::ARCH::CPU;
+  } else if (parser->arch == "gpu") {
+    arch = qnnx::ARCH::GPU;
+  } else if (parser->arch == "dsp") {
+    arch = qnnx::ARCH::DSP;
+  } else if (parser->arch == "htp") {
+    arch = qnnx::ARCH::HTP;
+  }
+
+  auto model = std::make_unique<qnnx::Model>(arch, qnn_function_pointers, sg_backend_handle,
                                              parser->input_list, parser->output_dir);
 
   model->Init();

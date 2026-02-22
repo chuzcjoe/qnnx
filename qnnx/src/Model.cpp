@@ -2,11 +2,12 @@
 
 namespace qnnx {
 
-Model::Model(QnnFunctionPointers function_pointers, void* backend_handle,
+Model::Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_handle,
              const std::string input_list_path, const std::string output_path,
              OutputDataType output_data_type, InputDataType input_data_type, const bool debug,
              const int num_inference, const bool dump_output)
-    : function_pointers_(function_pointers),
+    : arch_(arch),
+      function_pointers_(function_pointers),
       backend_handle_(backend_handle),
       input_list_path_(input_list_path),
       output_path_(output_path),
@@ -28,6 +29,22 @@ void Model::Init() {
   Assert(CreateDevice(), "failed to create device");
   Assert(InitializeProfiling(), "failed to initialize profiling");
   Assert(RegisterOpPackages(), "failed to register op packages");
+
+  switch (arch_) {
+    case ARCH::CPU:
+    case ARCH::GPU:
+      Assert(CreateContext(), "failed to create context");
+      break;
+    case ARCH::DSP:
+      QNNX_ERROR("DSP backend is not supported yet");
+      throw std::runtime_error("DSP backend is not supported yet");
+    case ARCH::HTP:
+      QNNX_ERROR("HTP backend is not supported yet");
+      throw std::runtime_error("HTP backend is not supported yet");
+    default:
+      QNNX_ERROR("Unsupported architecture");
+      throw std::runtime_error("Unsupported architecture");
+  }
 }
 
 void Model::PopulateTensors() {
@@ -133,6 +150,17 @@ QNNResults Model::InitializeProfiling() {
 // TODO: Implement op package registration in the future
 QNNResults Model::RegisterOpPackages() {
   // Register op packages code here
+  return QNNResults::SUCCESS;
+}
+
+QNNResults Model::CreateContext() {
+  if (QNN_CONTEXT_NO_ERROR != function_pointers_.qnnInterface.contextCreate(
+                                  backend_handle_, device_handle_,
+                                  (const QnnContext_Config_t**)context_config_, &context_)) {
+    QNNX_ERROR("Could not create context");
+    return QNNResults::FAIL;
+  }
+  context_created_ = true;
   return QNNResults::SUCCESS;
 }
 

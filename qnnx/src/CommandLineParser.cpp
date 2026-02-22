@@ -6,6 +6,7 @@
 namespace {
 
 enum class OptionKind : unsigned char {
+  kArch,
   kBackend,
   kModel,
   kInputList,
@@ -30,6 +31,8 @@ OptionKind ParseOption(std::string_view option) {
   const std::string_view name = option.substr(2);
 
   switch (HashName(name)) {
+    case HashName("arch"):
+      return name == "arch" ? OptionKind::kArch : OptionKind::kUnknown;
     case HashName("backend"):
       return name == "backend" ? OptionKind::kBackend : OptionKind::kUnknown;
     case HashName("model"):
@@ -63,6 +66,10 @@ bool CommandLineParser::Parse(int argc, char** argv, std::string& error) {
     const char* option_name = nullptr;
 
     switch (ParseOption(option)) {
+      case OptionKind::kArch:
+        out_value = &arch;
+        option_name = "--arch";
+        break;
       case OptionKind::kBackend:
         out_value = &backend;
         option_name = "--backend";

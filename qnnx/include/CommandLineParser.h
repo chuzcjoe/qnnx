@@ -3,6 +3,7 @@
 #include <string>
 
 struct CommandLineParser {
+  std::string arch;
   std::string backend;
   std::string model;
   std::string input_list;

@@ -12,7 +12,7 @@ namespace qnnx {
 
 class Model {
  public:
-  Model(QnnFunctionPointers function_pointers, void* backend_handle,
+  Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_handle,
         const std::string input_list_path, const std::string output_path,
         OutputDataType output_data_type = OutputDataType::FLOAT_ONLY,
         InputDataType input_data_type = InputDataType::FLOAT, const bool debug = false,
@@ -61,6 +61,7 @@ class Model {
 
  private:
   // commons
+  ARCH arch_;
   QnnFunctionPointers function_pointers_;
   void* backend_handle_;
   std::string input_list_path_;
@@ -84,6 +85,11 @@ class Model {
 
   // profiling related
   ProfilingLevel profiling_level_ = ProfilingLevel::OFF;
+
+  // context related
+  Qnn_ContextHandle_t context_ = nullptr;
+  QnnContext_Config_t** context_config_ = nullptr;
+  bool context_created_ = false;
 };
 
 }  // namespace qnnx

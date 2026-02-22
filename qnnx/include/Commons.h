@@ -6,6 +6,8 @@
 
 namespace qnnx {
 
+enum class ARCH { CPU, GPU, DSP, HTP };
+
 enum class QNNResults {
   SUCCESS,
   FAIL,
