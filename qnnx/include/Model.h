@@ -26,6 +26,8 @@ class Model {
   void Run();
 
  private:
+  QNNResults PrepareTensors();
+
   QNNResults Initialize();
 
   QNNResults InitializeBackend();
@@ -105,9 +107,14 @@ class Model {
   GraphConfigInfo_t** graph_configs_info_ = nullptr;
   uint32_t graph_configs_info_count_ = 0;
 
+  // tensor related
+  Qnn_Tensor_t* input_tensors_ = nullptr;
+  Qnn_Tensor_t* output_tensors_ = nullptr;
+
   // others
   QnnSystemProfile_SerializationTargetHandle_t serialization_target_handle_ = nullptr;
   std::string save_binary_name_;
+  std::unique_ptr<Tensor> io_tensor_;
 };
 
 }  // namespace qnnx

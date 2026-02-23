@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdlib.h>
+
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
@@ -44,5 +46,9 @@ void ReadFromRawFile(const std::string& file_path, std::vector<T>& buffer) {
     throw std::runtime_error("Failed to read file: " + file_path);
   }
 }
+
+char* Strndup(const char* source, size_t maxlen);
+
+size_t Memscpy(void* dst, size_t dst_size, const void* src, size_t copy_size);
 
 }  // namespace qnnx

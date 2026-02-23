@@ -15,7 +15,9 @@ Model::Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_han
       input_data_type_(input_data_type),
       debug_(debug),
       num_inference_(num_inference),
-      dump_output_(dump_output) {}
+      dump_output_(dump_output) {
+  io_tensor_ = std::make_unique<Tensor>();
+}
 
 Model::~Model() {}
 
@@ -48,7 +50,7 @@ void Model::Init() {
       throw std::runtime_error("Unsupported architecture");
   }
 
-  Assert(ExecuteGraphs(), "failed to execute graphs");
+  Assert(PrepareTensors(), "failed to prepare input and output tensors");
 }
 
 void Model::PopulateTensors() {
@@ -57,6 +59,21 @@ void Model::PopulateTensors() {
 
 void Model::Run() {
   // Run inference code here
+}
+
+QNNResults Model::PrepareTensors() {
+  // TODO: support more than 1 graph
+  if (graphs_count_ == 0 || graphs_count_ > 1) {
+    throw std::runtime_error("Currently only support 1 graph, but got " +
+                             std::to_string(graphs_count_));
+  }
+
+  QNNResults result =
+      io_tensor_->SetupInputAndOutputTensors(&input_tensors_, &output_tensors_, (*graphs_info_)[0]);
+  if (QNNResults::SUCCESS != result) {
+    throw std::runtime_error("Failed to prepare input and output tensors");
+  }
+  return result;
 }
 
 QNNResults Model::Initialize() {
