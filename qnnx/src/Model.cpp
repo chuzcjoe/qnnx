@@ -62,6 +62,7 @@ void Model::Run() {
 }
 
 QNNResults Model::PrepareTensors() {
+  QNNX_DEBUG("Number of graphs: %d", graphs_count_);
   // TODO: support more than 1 graph
   if (graphs_count_ == 0 || graphs_count_ > 1) {
     throw std::runtime_error("Currently only support 1 graph, but got " +
