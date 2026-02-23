@@ -23,7 +23,18 @@ int main(int argc, char** argv) {
   std::cout << "backend: " << parser->backend << '\n';
   std::cout << "model: " << parser->model << '\n';
   std::cout << "input_list: " << parser->input_list << '\n';
+  std::cout << "test_data: " << parser->test_data << '\n';
   std::cout << "output_dir: " << parser->output_dir << '\n';
+
+  // Read raw data
+  std::vector<float> input_data;
+  qnnx::ReadFromRawFile<float>(parser->test_data, input_data);
+  std::cout << "Read " << input_data.size() << " floats from " << parser->test_data << '\n';
+  std::cout << "First 10 floats: ";
+  for (size_t i = 0; i < 10; ++i) {
+    std::cout << input_data[i] << ' ';
+  }
+  std::cout << '\n';
 
   // Load backend and model libraries
   qnnx::QnnFunctionPointers qnn_function_pointers;

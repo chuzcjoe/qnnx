@@ -11,3 +11,4 @@ build/
 output/
 .vscode/
 .DS_Store
+*.raw

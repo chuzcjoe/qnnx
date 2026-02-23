@@ -10,6 +10,7 @@ enum class OptionKind : unsigned char {
   kBackend,
   kModel,
   kInputList,
+  kTestData,
   kOutputDir,
   kUnknown,
 };
@@ -39,6 +40,8 @@ OptionKind ParseOption(std::string_view option) {
       return name == "model" ? OptionKind::kModel : OptionKind::kUnknown;
     case HashName("input_list"):
       return name == "input_list" ? OptionKind::kInputList : OptionKind::kUnknown;
+    case HashName("test_data"):
+      return name == "test_data" ? OptionKind::kTestData : OptionKind::kUnknown;
     case HashName("output_dir"):
       return name == "output_dir" ? OptionKind::kOutputDir : OptionKind::kUnknown;
     default:
@@ -81,6 +84,10 @@ bool CommandLineParser::Parse(int argc, char** argv, std::string& error) {
       case OptionKind::kInputList:
         out_value = &input_list;
         option_name = "--input_list";
+        break;
+      case OptionKind::kTestData:
+        out_value = &test_data;
+        option_name = "--test_data";
         break;
       case OptionKind::kOutputDir:
         out_value = &output_dir;

@@ -47,6 +47,8 @@ void Model::Init() {
       QNNX_ERROR("Unsupported architecture");
       throw std::runtime_error("Unsupported architecture");
   }
+
+  Assert(ExecuteGraphs(), "failed to execute graphs");
 }
 
 void Model::PopulateTensors() {
@@ -184,6 +186,7 @@ QNNResults Model::ComposeGraphs() {
   return result;
 }
 
+// finalize graphs, need to implement commented functions in the future
 QNNResults Model::FinalizeGraphs() {
   for (size_t graph_idx = 0; graph_idx < graphs_count_; ++graph_idx) {
     // Profile this API call
@@ -220,6 +223,12 @@ QNNResults Model::FinalizeGraphs() {
     QNNX_DEBUG("save_binary_name_ is empty()");
   }
   return result;
+}
+
+QNNResults Model::ExecuteGraphs() {
+  QNNX_INFO("Executing graphs");
+  // Execute graphs code here
+  return QNNResults::SUCCESS;
 }
 
 // Get backend build ID
