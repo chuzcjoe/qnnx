@@ -42,6 +42,8 @@ struct Tensor {
   QNNResults ClearTensors(Qnn_Tensor_t* inputs, Qnn_Tensor_t* outputs, size_t num_input_tensors,
                           size_t num_output_tensors);
 
+  QNNResults FreeGraphs(GraphInfoPtr_t** graphs_info, uint32_t num_graphs);
+
  private:
   QNNResults SetupTensors(Qnn_Tensor_t** tensors, uint32_t tensor_count,
                           Qnn_Tensor_t* tensors_info);
@@ -58,6 +60,10 @@ struct Tensor {
                              InputDataType input_data_type);
 
   QNNResults ClearTensor(Qnn_Tensor_t* tensor, size_t count);
+
+  ModelError_t FreeQnnTensors(Qnn_Tensor_t*& tensors, uint32_t num_tensors);
+
+  ModelError_t FreeQnnTensor(Qnn_Tensor_t& tensor);
 
   size_t CalculateElementCount(std::vector<size_t> dims) const {
     if (dims.size() == 0) return 0;

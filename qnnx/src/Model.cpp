@@ -21,15 +21,23 @@ Model::Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_han
 
 Model::~Model() {
   if (io_tensor_) {
-    const auto result = io_tensor_->ClearTensors(input_tensors_, output_tensors_,
-                                                 (*graphs_info_)[0].numInputTensors,
-                                                 (*graphs_info_)[0].numOutputTensors);
+    auto result = io_tensor_->ClearTensors(input_tensors_, output_tensors_,
+                                           (*graphs_info_)[0].numInputTensors,
+                                           (*graphs_info_)[0].numOutputTensors);
     if (QNNResults::SUCCESS != result) {
       QNNX_ERROR("Failed to clear tensors");
     } else {
       QNNX_INFO("Successfully cleared tensors");
       input_tensors_ = nullptr;
       output_tensors_ = nullptr;
+    }
+
+    result = io_tensor_->FreeGraphs(&graphs_info_, graphs_count_);
+    if (QNNResults::SUCCESS != result) {
+      QNNX_ERROR("Failed to free graphs");
+    } else {
+      QNNX_INFO("Successfully freed graphs");
+      graphs_info_ = nullptr;
     }
   }
 }

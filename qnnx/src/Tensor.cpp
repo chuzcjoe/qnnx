@@ -374,4 +374,53 @@ QNNResults Tensor::ClearTensor(Qnn_Tensor_t* tensor, size_t count) {
   return QNNResults::SUCCESS;
 }
 
+QNNResults Tensor::FreeGraphs(GraphInfoPtr_t** graphs_info, uint32_t num_graphs) {
+  if (nullptr == graphs_info || nullptr == *graphs_info) {
+    QNNX_ERROR("FreeGraphs failed, graphs_info is nullptr");
+    return QNNResults::FAIL;
+  }
+
+  for (uint32_t i = 0; i < num_graphs; ++i) {
+    free((*graphs_info)[i]->graphName);
+    const auto result_in =
+        FreeQnnTensors((*graphs_info)[i]->inputTensors, (*graphs_info)[i]->numInputTensors);
+    const auto result_out =
+        FreeQnnTensors((*graphs_info)[i]->outputTensors, (*graphs_info)[i]->numOutputTensors);
+    if (result_in != MODEL_NO_ERROR || result_out != MODEL_NO_ERROR) {
+      QNNX_ERROR("FreeGraphs failed, result_in: %d, result_out: %d", result_in, result_out);
+      return QNNResults::FAIL;
+    }
+  }
+  free(**graphs_info);
+  free(*graphs_info);
+  *graphs_info = nullptr;
+  return QNNResults::SUCCESS;
+}
+
+ModelError_t Tensor::FreeQnnTensors(Qnn_Tensor_t*& tensors, uint32_t num_tensors) {
+  // free all pointer allocations in struct
+  for (size_t i = 0; i < num_tensors; ++i) {
+    FreeQnnTensor(tensors[i]);
+  }
+  free(tensors);
+  return MODEL_NO_ERROR;
+}
+
+ModelError_t Tensor::FreeQnnTensor(Qnn_Tensor_t& tensor) {
+  // free all pointer allocations in struct
+  free((void*)QNN_TENSOR_GET_NAME(tensor));
+  free(QNN_TENSOR_GET_DIMENSIONS(tensor));
+  if (QNN_TENSOR_GET_IS_DYNAMIC_DIMENSIONS(tensor)) {
+    free(QNN_TENSOR_GET_IS_DYNAMIC_DIMENSIONS(tensor));
+  }
+  auto quant = QNN_TENSOR_GET_QUANT_PARAMS(tensor);
+  auto encoding = quant.quantizationEncoding;
+  if (encoding == QNN_QUANTIZATION_ENCODING_AXIS_SCALE_OFFSET) {
+    if (quant.axisScaleOffsetEncoding.scaleOffset != nullptr) {
+      free(quant.axisScaleOffsetEncoding.scaleOffset);
+    }
+  }
+  return MODEL_NO_ERROR;
+}
+
 }  // namespace qnnx
