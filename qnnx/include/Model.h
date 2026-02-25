@@ -22,7 +22,7 @@ class Model {
   ~Model();
 
   void Init();
-  void PopulateTensors();
+  void PopulateInputTensors(const uint8_t** data);
   void Run();
 
  private:

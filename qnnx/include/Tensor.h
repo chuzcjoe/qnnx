@@ -37,6 +37,9 @@ struct Tensor {
   QNNResults SetupInputAndOutputTensors(Qnn_Tensor_t** inputs, Qnn_Tensor_t** outputs,
                                         GraphInfo_t graph_info);
 
+  QNNResults FillInputTensors(const uint8_t** data, Qnn_Tensor_t* inputs, GraphInfo_t graph_info,
+                              InputDataType input_data_type);
+
  private:
   QNNResults SetupTensors(Qnn_Tensor_t** tensors, uint32_t tensor_count,
                           Qnn_Tensor_t* tensors_info);
@@ -48,6 +51,9 @@ struct Tensor {
   bool DeepCopyQnnTensorInfo(Qnn_Tensor_t* dst, const Qnn_Tensor_t* src);
 
   QNNResults AllocateBuffer(uint8_t** buffer, std::vector<size_t> dims, Qnn_DataType_t data_type);
+
+  QNNResults FillInputTensor(const uint8_t* data, Qnn_Tensor_t* input,
+                             InputDataType input_data_type);
 
   size_t CalculateElementCount(std::vector<size_t> dims) const {
     if (dims.size() == 0) return 0;

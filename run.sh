@@ -45,7 +45,7 @@ adb shell "mkdir -p ${device_path}/output"
 # adb push "${QNN_SDK_ROOT}/lib/hexagon-v79/unsigned/libQnnHtpV79Skel.so" ${device_path}
 # adb push "${QNN_SDK_ROOT}/lib/hexagon-v73/unsigned/libQnnSystem.so" ${device_path}
 
-# adb push ./build/sample_app/qnn-sample-app ${device_path}
+adb push ./build/sample_app/qnn-sample-app ${device_path}
 # adb push ./model_tmp/fp32/aarch64-android/libfcn_fp32.so ${device_path}
 # adb push ./model_tmp/libfcn_quant.serialized.bin ${device_path}
 # adb push ./python/fcn/test.raw ${device_path}

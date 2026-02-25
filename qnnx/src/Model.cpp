@@ -53,8 +53,15 @@ void Model::Init() {
   Assert(PrepareTensors(), "failed to prepare input and output tensors");
 }
 
-void Model::PopulateTensors() {
-  // Populate tensors code here
+void Model::PopulateInputTensors(const uint8_t** data) {
+  // Populate input tensors code here
+  if (graphs_count_ == 0 || graphs_count_ > 1) {
+    throw std::runtime_error("Currently only support 1 graph, but got " +
+                             std::to_string(graphs_count_));
+  }
+
+  auto graph_info = (*graphs_info_)[0];
+  io_tensor_->FillInputTensors(data, input_tensors_, graph_info, input_data_type_);
 }
 
 void Model::Run() {

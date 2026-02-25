@@ -197,8 +197,11 @@ iotensor::PopulateInputTensorsRetType_t iotensor::IOTensor::populateInputTensor(
   std::vector<size_t> dims;
   fillDims(dims, QNN_TENSOR_GET_DIMENSIONS(input), QNN_TENSOR_GET_RANK(input));
 
+  std::cout << "Input tensor data type: " << QNN_TENSOR_GET_DATA_TYPE(input) << std::endl;
+
   if (inputDataType == InputDataType::FLOAT &&
       QNN_TENSOR_GET_DATA_TYPE(input) != QNN_DATATYPE_FLOAT_32) {
+    std::cout << "Reading data from files into buffer for non-FLOAT input tensor" << std::endl;
     uint8_t* fileToBuffer = nullptr;
     std::tie(returnStatus, numFilesPopulated, batchSize) =
         readDataAndAllocateBuffer(filePaths, filePathsIndexOffset, loopBackToStart, dims,
@@ -212,6 +215,7 @@ iotensor::PopulateInputTensorsRetType_t iotensor::IOTensor::populateInputTensor(
       fileToBuffer = nullptr;
     }
   } else {
+    std::cout << "Reading data from files into buffer for FLOAT input tensor" << std::endl;
     datautil::StatusCode status;
     std::tie(status, numFilesPopulated, batchSize) = datautil::readBatchData(
         filePaths, filePathsIndexOffset, loopBackToStart, dims, QNN_TENSOR_GET_DATA_TYPE(input),

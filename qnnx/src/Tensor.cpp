@@ -1,5 +1,7 @@
 #include "Tensor.h"
 
+#include <cstring>
+
 #include "File.h"
 #include "Types.h"
 
@@ -281,6 +283,59 @@ QNNResults Tensor::AllocateBuffer(uint8_t** buffer, std::vector<size_t> dims,
       result = QNNResults::FAIL;
       break;
   }
+  return result;
+}
+
+QNNResults Tensor::FillInputTensors(const uint8_t** data, Qnn_Tensor_t* inputs,
+                                    GraphInfo_t graph_info, InputDataType input_data_type) {
+  auto result = QNNResults::SUCCESS;
+
+  if (nullptr == inputs) {
+    QNNX_ERROR("FillInputTensors failed, inputs is nullptr");
+    return QNNResults::FAIL;
+  }
+
+  // The number of input tensors here means the number of different model inputs
+  // for example, for denoise task, the model could have two inputs:
+  // 1: a noisy image
+  // 2: a mask to guide denoising
+  // Most tasks have just one input
+  const auto input_tensor_count = graph_info.numInputTensors;
+  for (size_t i = 0; i < input_tensor_count; ++i) {
+    result = FillInputTensor(data[i], &(inputs[i]), input_data_type);
+    if (QNNResults::SUCCESS != result) {
+      QNNX_ERROR("Failed to FillInputTensor for tensor index: %zu", i);
+      return QNNResults::FAIL;
+    }
+  }
+
+  return result;
+}
+
+QNNResults Tensor::FillInputTensor(const uint8_t* data, Qnn_Tensor_t* input,
+                                   InputDataType input_data_type) {
+  auto result = QNNResults::SUCCESS;
+
+  if (nullptr == input || nullptr == data) {
+    QNNX_ERROR("FillInputTensor failed, input or data is nullptr");
+    return QNNResults::FAIL;
+  }
+
+  std::vector<size_t> dims;
+  GetDimensions(dims, QNN_TENSOR_GET_DIMENSIONS(input), QNN_TENSOR_GET_RANK(input));
+
+  const auto input_tensor_type = QNN_TENSOR_GET_DATA_TYPE(input);
+  size_t length = CalculateLength(dims, input_tensor_type);
+
+  QNNX_INFO("Filling input tensor, input tensor type %d", input_tensor_type);
+  if (input_data_type == InputDataType::FLOAT && input_tensor_type != QNN_DATATYPE_FLOAT_32) {
+    throw std::runtime_error(
+        "Input data type is FLOAT but input tensor data type is not FLOAT_32, to be implemented");
+  } else {
+    auto client_buffer = static_cast<uint8_t*>(QNN_TENSOR_GET_CLIENT_BUF(input).data);
+    std::memcpy(client_buffer, data, length);
+  }
+
   return result;
 }
 

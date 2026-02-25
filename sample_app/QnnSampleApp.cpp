@@ -780,6 +780,8 @@ sample_app::StatusCode sample_app::QnnSampleApp::executeGraphs() {
       auto graphInfo = (*m_graphsInfo)[graphIdx];
       if (!inputFileList.empty()) {
         size_t totalCount = inputFileList[0].size();
+        std::cout << "Total input files for graphIdx " << graphIdx << ": " << totalCount
+                  << std::endl;
         size_t inputFileIndexOffset = 0;
         while (inputFileIndexOffset < totalCount) {
           iotensor::StatusCode iotReturnStatus;

@@ -36,6 +36,8 @@ int main(int argc, char** argv) {
   }
   std::cout << '\n';
 
+  const uint8_t* input_data_array[] = {reinterpret_cast<const uint8_t*>(input_data.data())};
+
   // Load backend and model libraries
   qnnx::QnnFunctionPointers qnn_function_pointers;
   qnnx::QNNResults result = qnnx::GetQNNFunctionPointer(
@@ -60,6 +62,7 @@ int main(int argc, char** argv) {
                                              parser->input_list, parser->output_dir);
 
   model->Init();
+  model->PopulateInputTensors(input_data_array);
 
   return 0;
 }
