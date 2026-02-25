@@ -63,6 +63,7 @@ int main(int argc, char** argv) {
 
   model->Init();
   model->PopulateInputTensors(input_data_array);
+  model->Run();
 
   return 0;
 }

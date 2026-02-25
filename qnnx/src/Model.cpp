@@ -19,7 +19,20 @@ Model::Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_han
   io_tensor_ = std::make_unique<Tensor>();
 }
 
-Model::~Model() {}
+Model::~Model() {
+  if (io_tensor_) {
+    const auto result = io_tensor_->ClearTensors(input_tensors_, output_tensors_,
+                                                 (*graphs_info_)[0].numInputTensors,
+                                                 (*graphs_info_)[0].numOutputTensors);
+    if (QNNResults::SUCCESS != result) {
+      QNNX_ERROR("Failed to clear tensors");
+    } else {
+      QNNX_INFO("Successfully cleared tensors");
+      input_tensors_ = nullptr;
+      output_tensors_ = nullptr;
+    }
+  }
+}
 
 void Model::Init() {
   auto build_id = GetBackendBuildId();
@@ -61,11 +74,17 @@ void Model::PopulateInputTensors(const uint8_t** data) {
   }
 
   auto graph_info = (*graphs_info_)[0];
-  io_tensor_->FillInputTensors(data, input_tensors_, graph_info, input_data_type_);
+  auto result = io_tensor_->FillInputTensors(data, input_tensors_, graph_info, input_data_type_);
+  if (QNNResults::SUCCESS != result) {
+    throw std::runtime_error("Failed to populate input tensors");
+  } else {
+    QNNX_INFO("Successfully populated input tensors");
+  }
 }
 
 void Model::Run() {
   // Run inference code here
+  Assert(ExecuteGraphs(), "failed to execute graphs");
 }
 
 QNNResults Model::PrepareTensors() {
@@ -251,9 +270,25 @@ QNNResults Model::FinalizeGraphs() {
 }
 
 QNNResults Model::ExecuteGraphs() {
+  if (graphs_count_ == 0 || graphs_count_ > 1) {
+    throw std::runtime_error("Currently only support 1 graph, but got " +
+                             std::to_string(graphs_count_));
+  }
+
   QNNX_INFO("Executing graphs");
   // Execute graphs code here
-  return QNNResults::SUCCESS;
+  auto graph_info = (*graphs_info_)[0];
+  auto result = function_pointers_.qnnInterface.graphExecute(
+      graph_info.graph, input_tensors_, graph_info.numInputTensors, output_tensors_,
+      graph_info.numOutputTensors, profile_backend_handle_, nullptr);
+
+  if (QNN_GRAPH_NO_ERROR != result) {
+    QNNX_ERROR("Failed to execute graph due to error = %lu", result);
+    return QNNResults::FAIL;
+  } else {
+    QNNX_INFO("Successfully executed graph");
+    return QNNResults::SUCCESS;
+  }
 }
 
 // Get backend build ID

@@ -339,4 +339,39 @@ QNNResults Tensor::FillInputTensor(const uint8_t* data, Qnn_Tensor_t* input,
   return result;
 }
 
+QNNResults Tensor::ClearTensors(Qnn_Tensor_t* inputs, Qnn_Tensor_t* outputs,
+                                size_t num_input_tensors, size_t num_output_tensors) {
+  if (nullptr != inputs) {
+    QNNX_INFO("cleaning up resources for input tensors");
+    ClearTensor(inputs, num_input_tensors);
+    inputs = nullptr;
+  }
+  if (nullptr != outputs) {
+    QNNX_INFO("cleaning up resources for output tensors");
+    ClearTensor(outputs, num_output_tensors);
+    outputs = nullptr;
+  }
+  return QNNResults::SUCCESS;
+}
+
+QNNResults Tensor::ClearTensor(Qnn_Tensor_t* tensor, size_t count) {
+  for (size_t tensor_idx = 0; tensor_idx < count; ++tensor_idx) {
+    QNNX_DEBUG("freeing resources for tensor: %zu", tensor_idx);
+    if (nullptr != QNN_TENSOR_GET_NAME(tensor[tensor_idx])) {
+      free(const_cast<char*>(QNN_TENSOR_GET_NAME(tensor[tensor_idx])));
+      QNN_TENSOR_SET_NAME(tensor[tensor_idx], nullptr);
+    }
+    if (nullptr != QNN_TENSOR_GET_DIMENSIONS(tensor[tensor_idx])) {
+      free(QNN_TENSOR_GET_DIMENSIONS(tensor[tensor_idx]));
+      QNN_TENSOR_SET_DIMENSIONS(tensor[tensor_idx], nullptr);
+    }
+    if (nullptr != QNN_TENSOR_GET_CLIENT_BUF(tensor[tensor_idx]).data) {
+      QNNX_DEBUG("freeing clientBuf.data");
+      free(QNN_TENSOR_GET_CLIENT_BUF(tensor[tensor_idx]).data);
+    }
+  }
+  free(tensor);
+  return QNNResults::SUCCESS;
+}
+
 }  // namespace qnnx
