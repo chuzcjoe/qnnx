@@ -1,13 +1,9 @@
-qnn/
 *.pt
 *.pth
 model_tmp/
 .pkl_*
 __pycache__
-# sample_app/
 build/
-# include/QNN/
-# include/*
 output/
 .vscode/
 .DS_Store
