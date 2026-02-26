@@ -9,6 +9,8 @@ file(GLOB APP_SOURCES
 
 add_executable(${APP} ${APP_SOURCES})
 
-include_directories(include ../external/QNN/include)
+target_include_directories(${APP} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
-target_link_libraries(${APP} log)
+target_link_libraries(${APP} qnn log)

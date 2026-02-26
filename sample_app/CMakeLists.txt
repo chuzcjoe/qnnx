@@ -20,6 +20,14 @@ file(GLOB APP_SOURCES
 
 add_executable(${APP} ${APP_SOURCES})
 
-include_directories(. Log PAL/include Utils WrapperUtils ../external/QNN/include)
+target_include_directories(${APP} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Log
+    ${CMAKE_CURRENT_SOURCE_DIR}/PAL/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/WrapperUtils
+)
+
+target_link_libraries(${APP} qnn)
 
 
