@@ -3,14 +3,20 @@
 namespace qnnx {
 
 Model::Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_handle,
-             const std::string input_list_path, const std::string output_path,
-             OutputDataType output_data_type, InputDataType input_data_type, const bool debug,
-             const int num_inference, const bool dump_output)
+             const std::string output_path, const int in_width, const int in_height,
+             const int in_channels, const int out_width, const int out_height,
+             const int out_channels, OutputDataType output_data_type, InputDataType input_data_type,
+             const bool debug, const int num_inference, const bool dump_output)
     : arch_(arch),
       function_pointers_(function_pointers),
       backend_handle_(backend_handle),
-      input_list_path_(input_list_path),
       output_path_(output_path),
+      in_width_(in_width),
+      in_height_(in_height),
+      in_channels_(in_channels),
+      out_width_(out_width),
+      out_height_(out_height),
+      out_channels_(out_channels),
       output_data_type_(output_data_type),
       input_data_type_(input_data_type),
       debug_(debug),
@@ -295,6 +301,29 @@ QNNResults Model::ExecuteGraphs() {
     return QNNResults::FAIL;
   } else {
     QNNX_INFO("Successfully executed graph");
+
+    // save output results
+    switch (arch_) {
+      case ARCH::CPU:
+      case ARCH::GPU: {
+        const int batch_size = io_tensor_->GetBatchSize(graph_info);
+        QNNX_INFO("Output batch size: %d, width: %d, height: %d, channels: %d", batch_size,
+                  out_width_, out_height_, out_channels_);
+        const int total_size =
+            batch_size * out_width_ * out_height_ * out_channels_ * sizeof(float);
+        outputs_ = (float*)malloc(total_size);
+        std::memcpy(outputs_,
+                    reinterpret_cast<float*>(QNN_TENSOR_GET_CLIENT_BUF(output_tensors_).data),
+                    total_size);
+        break;
+      }
+      case ARCH::DSP:
+        throw std::runtime_error("DSP is not supported");
+      case ARCH::HTP:
+        throw std::runtime_error("HTP is not supported");
+      default:
+        throw std::runtime_error("Unknown architecture");
+    }
     return QNNResults::SUCCESS;
   }
 }

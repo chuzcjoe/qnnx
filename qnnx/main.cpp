@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -11,6 +12,8 @@
 static void* sg_backend_handle = nullptr;
 static void* sg_model_handle = nullptr;
 
+constexpr const char* kResultsFile = "/data/local/tmp/qnnx/results.raw";
+
 int main(int argc, char** argv) {
   auto parser = std::make_unique<CommandLineParser>();
   std::string error;
@@ -22,9 +25,14 @@ int main(int argc, char** argv) {
   std::cout << "arch: " << parser->arch << '\n';
   std::cout << "backend: " << parser->backend << '\n';
   std::cout << "model: " << parser->model << '\n';
-  std::cout << "input_list: " << parser->input_list << '\n';
   std::cout << "test_data: " << parser->test_data << '\n';
   std::cout << "output_dir: " << parser->output_dir << '\n';
+  std::cout << "in_width: " << parser->in_width << '\n';
+  std::cout << "in_height: " << parser->in_height << '\n';
+  std::cout << "in_channels: " << parser->in_channels << '\n';
+  std::cout << "out_width: " << parser->out_width << '\n';
+  std::cout << "out_height: " << parser->out_height << '\n';
+  std::cout << "out_channels: " << parser->out_channels << '\n';
 
   // Read raw data
   std::vector<float> input_data;
@@ -58,12 +66,32 @@ int main(int argc, char** argv) {
     arch = qnnx::ARCH::HTP;
   }
 
-  auto model = std::make_unique<qnnx::Model>(arch, qnn_function_pointers, sg_backend_handle,
-                                             parser->input_list, parser->output_dir);
+  auto model = std::make_unique<qnnx::Model>(
+      arch, qnn_function_pointers, sg_backend_handle, parser->output_dir, parser->in_width,
+      parser->in_height, parser->in_channels, parser->out_width, parser->out_height,
+      parser->out_channels);
 
   model->Init();
   model->PopulateInputTensors(input_data_array);
   model->Run();
+
+  float* output_data = model->GetOutputData();
+  if (output_data) {
+    const size_t output_elements =
+        static_cast<size_t>(parser->out_width) * parser->out_height * parser->out_channels;
+
+    std::ofstream results_file(kResultsFile, std::ios::binary | std::ios::trunc);
+    if (!results_file) {
+      throw std::runtime_error(std::string("failed to open output file: ") + kResultsFile);
+    }
+
+    results_file.write(reinterpret_cast<const char*>(output_data),
+                       static_cast<std::streamsize>(output_elements * sizeof(float)));
+    if (!results_file) {
+      throw std::runtime_error(std::string("failed to write output file: ") + kResultsFile);
+    }
+    std::cout << "Output data written to " << kResultsFile << '\n';
+  }
 
   return 0;
 }

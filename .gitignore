@@ -13,3 +13,4 @@ output/
 .DS_Store
 *.raw
 *.txt
+qnn_env/

@@ -12,6 +12,7 @@
 #include "QnnContext.h"
 #include "QnnGraph.h"
 #include "QnnProperty.h"
+#include "Types.h"
 
 namespace qnnx {
 
@@ -43,6 +44,11 @@ struct Tensor {
                           size_t num_output_tensors);
 
   QNNResults FreeGraphs(GraphInfoPtr_t** graphs_info, uint32_t num_graphs);
+
+  int GetBatchSize(GraphInfo_t graph_info) const {
+    const Qnn_Tensor_t& input_tensor = graph_info.inputTensors[0];
+    return static_cast<int>(QNN_TENSOR_GET_DIMENSIONS(input_tensor)[0]);
+  }
 
  private:
   QNNResults SetupTensors(Qnn_Tensor_t** tensors, uint32_t tensor_count,

@@ -1,5 +1,6 @@
 #include "CommandLineParser.h"
 
+#include <charconv>
 #include <cstdint>
 #include <string_view>
 
@@ -9,7 +10,12 @@ enum class OptionKind : unsigned char {
   kArch,
   kBackend,
   kModel,
-  kInputList,
+  kInWidth,
+  kInHeight,
+  kInChannels,
+  kOutWidth,
+  kOutHeight,
+  kOutChannels,
   kTestData,
   kOutputDir,
   kUnknown,
@@ -38,8 +44,18 @@ OptionKind ParseOption(std::string_view option) {
       return name == "backend" ? OptionKind::kBackend : OptionKind::kUnknown;
     case HashName("model"):
       return name == "model" ? OptionKind::kModel : OptionKind::kUnknown;
-    case HashName("input_list"):
-      return name == "input_list" ? OptionKind::kInputList : OptionKind::kUnknown;
+    case HashName("in_width"):
+      return name == "in_width" ? OptionKind::kInWidth : OptionKind::kUnknown;
+    case HashName("in_height"):
+      return name == "in_height" ? OptionKind::kInHeight : OptionKind::kUnknown;
+    case HashName("in_channels"):
+      return name == "in_channels" ? OptionKind::kInChannels : OptionKind::kUnknown;
+    case HashName("out_width"):
+      return name == "out_width" ? OptionKind::kOutWidth : OptionKind::kUnknown;
+    case HashName("out_height"):
+      return name == "out_height" ? OptionKind::kOutHeight : OptionKind::kUnknown;
+    case HashName("out_channels"):
+      return name == "out_channels" ? OptionKind::kOutChannels : OptionKind::kUnknown;
     case HashName("test_data"):
       return name == "test_data" ? OptionKind::kTestData : OptionKind::kUnknown;
     case HashName("output_dir"):
@@ -65,32 +81,53 @@ bool CommandLineParser::Parse(int argc, char** argv, std::string& error) {
       has_inline_value = true;
     }
 
-    std::string* out_value = nullptr;
+    std::string* out_string = nullptr;
+    int* out_int = nullptr;
     const char* option_name = nullptr;
 
     switch (ParseOption(option)) {
       case OptionKind::kArch:
-        out_value = &arch;
+        out_string = &arch;
         option_name = "--arch";
         break;
       case OptionKind::kBackend:
-        out_value = &backend;
+        out_string = &backend;
         option_name = "--backend";
         break;
       case OptionKind::kModel:
-        out_value = &model;
+        out_string = &model;
         option_name = "--model";
         break;
-      case OptionKind::kInputList:
-        out_value = &input_list;
-        option_name = "--input_list";
+      case OptionKind::kInWidth:
+        out_int = &in_width;
+        option_name = "--in_width";
+        break;
+      case OptionKind::kInHeight:
+        out_int = &in_height;
+        option_name = "--in_height";
+        break;
+      case OptionKind::kInChannels:
+        out_int = &in_channels;
+        option_name = "--in_channels";
+        break;
+      case OptionKind::kOutWidth:
+        out_int = &out_width;
+        option_name = "--out_width";
+        break;
+      case OptionKind::kOutHeight:
+        out_int = &out_height;
+        option_name = "--out_height";
+        break;
+      case OptionKind::kOutChannels:
+        out_int = &out_channels;
+        option_name = "--out_channels";
         break;
       case OptionKind::kTestData:
-        out_value = &test_data;
+        out_string = &test_data;
         option_name = "--test_data";
         break;
       case OptionKind::kOutputDir:
-        out_value = &output_dir;
+        out_string = &output_dir;
         option_name = "--output_dir";
         break;
       case OptionKind::kUnknown:
@@ -99,18 +136,33 @@ bool CommandLineParser::Parse(int argc, char** argv, std::string& error) {
         return false;
     }
 
+    std::string_view value;
     if (has_inline_value) {
-      out_value->assign(inline_value.data(), inline_value.size());
+      value = inline_value;
+    } else {
+      if (i + 1 >= argc) {
+        error = "Missing value for ";
+        error += option_name;
+        return false;
+      }
+      value = argv[++i];
+    }
+
+    if (out_string != nullptr) {
+      out_string->assign(value.data(), value.size());
       continue;
     }
 
-    if (i + 1 >= argc) {
-      error = "Missing value for ";
+    int parsed = 0;
+    const char* begin = value.data();
+    const char* end = begin + value.size();
+    auto [ptr, ec] = std::from_chars(begin, end, parsed);
+    if (ec != std::errc() || ptr != end) {
+      error = "Invalid integer value for ";
       error += option_name;
       return false;
     }
-
-    *out_value = argv[++i];
+    *out_int = parsed;
   }
 
   return true;

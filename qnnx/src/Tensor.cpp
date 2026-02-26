@@ -3,7 +3,6 @@
 #include <cstring>
 
 #include "File.h"
-#include "Types.h"
 
 namespace qnnx {
 

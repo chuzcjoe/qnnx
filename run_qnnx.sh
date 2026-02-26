@@ -56,15 +56,13 @@ adb push ./build/qnnx/qnnx-app ${device_path}
 
 
 if [ "$backend" = "cpu" ]; then
-    # adb push ${QNN_SDK_ROOT}/lib/${QNN_TARGET_ARCH}/libQnnCpu.so ${device_path}
-
+    adb push ./external/QNN/libs/libQnnCpu.so ${device_path}
     adb shell "chmod +x ${device_path}/qnnx-app"
-    adb shell "export LD_LIBRARY_PATH=${device_path} && export ADSP_LIBRARY_PATH=${device_path} && export MEMTAG_OPTIONS=off && ${device_path}/qnnx-app --arch cpu --backend ${device_path}/libQnnCpu.so --model ${device_path}/libfcn_fp32.so --input_list ${device_path}/input_list.txt --test_data ${device_path}/test.raw --output_dir ${device_path}/output"
+    adb shell "export LD_LIBRARY_PATH=${device_path} && export ADSP_LIBRARY_PATH=${device_path} && export MEMTAG_OPTIONS=off && ${device_path}/qnnx-app --arch cpu --backend ${device_path}/libQnnCpu.so --model ${device_path}/libfcn_fp32.so --in_width 1000 --in_height 750 --in_channels 3 --out_width 1000 --out_height 750 --out_channels 21 --test_data ${device_path}/test.raw --output_dir ${device_path}/output"
 elif [ "$backend" = "gpu" ]; then
-    # adb push ${QNN_SDK_ROOT}/lib/${QNN_TARGET_ARCH}/libQnnGpu.so ${device_path}
-
+    adb push ./external/QNN/libs/libQnnGpu.so ${device_path}
     adb shell "chmod +x ${device_path}/qnnx-app"
-    adb shell "export LD_LIBRARY_PATH=${device_path} && export ADSP_LIBRARY_PATH=${device_path} && export MEMTAG_OPTIONS=off && ${device_path}/qnnx-app --backend ${device_path}/libQnnGpu.so --model ${device_path}/libfcn_fp32.so --input_list ${device_path}/input_list.txt --output_dir ${device_path}/output"
+    adb shell "export LD_LIBRARY_PATH=${device_path} && export ADSP_LIBRARY_PATH=${device_path} && export MEMTAG_OPTIONS=off && ${device_path}/qnnx-app --arch gpu --backend ${device_path}/libQnnGpu.so --model ${device_path}/libfcn_fp32.so --in_width 1000 --in_height 750 --in_channels 3 --out_width 1000 --out_height 750 --out_channels 21 --test_data ${device_path}/test.raw --output_dir ${device_path}/output"
 elif [ "$backend" = "htp" ]; then
     # adb push ${QNN_SDK_ROOT}/lib/${QNN_TARGET_ARCH}/libQnnHtp.so ${device_path}
     # adb push ${QNN_SDK_ROOT}/lib/${QNN_TARGET_ARCH}/libQnnSystem.so ${device_path}
@@ -77,3 +75,4 @@ else
 fi
 
 adb pull ${device_path}/output .
+adb pull ${device_path}/results.raw .

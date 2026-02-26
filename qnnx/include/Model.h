@@ -14,7 +14,8 @@ namespace qnnx {
 class Model {
  public:
   Model(ARCH arch, QnnFunctionPointers function_pointers, void* backend_handle,
-        const std::string input_list_path, const std::string output_path,
+        const std::string output_path, const int in_width, const int in_height,
+        const int in_channels, const int out_width, const int out_height, const int out_channels,
         OutputDataType output_data_type = OutputDataType::FLOAT_ONLY,
         InputDataType input_data_type = InputDataType::FLOAT, const bool debug = false,
         const int num_inference = 1, const bool dump_output = false);
@@ -24,6 +25,8 @@ class Model {
   void Init();
   void PopulateInputTensors(const uint8_t** data);
   void Run();
+
+  float* GetOutputData() const { return outputs_; }
 
  private:
   QNNResults PrepareTensors();
@@ -73,13 +76,19 @@ class Model {
   ARCH arch_;
   QnnFunctionPointers function_pointers_;
   void* backend_handle_;
-  std::string input_list_path_;
   std::string output_path_;
+  int in_width_;
+  int in_height_;
+  int in_channels_;
+  int out_width_;
+  int out_height_;
+  int out_channels_;
   OutputDataType output_data_type_;
   InputDataType input_data_type_;
   bool debug_;
   int num_inference_;
   bool dump_output_;
+  float* outputs_;
 
   // Log related
   std::shared_ptr<QnnxLog> qnnx_logger_ = nullptr;
