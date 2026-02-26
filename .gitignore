@@ -8,5 +8,5 @@ output/
 .vscode/
 .DS_Store
 *.raw
-*.txt
+# *.txt
 qnn_env/
